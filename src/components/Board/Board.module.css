@@ -1,0 +1,49 @@
+@import "../../constants.css";
+
+.board {
+	display: grid;
+	position: relative;
+	grid-template-columns: calc(0.25 * var(--tile-size)) calc(
+			8 * var(--tile-size)
+		);
+}
+
+.tiles {
+	display: grid;
+	grid-template-columns: repeat(8, var(--tile-size));
+	grid-template-rows: repeat(8, var(--tile-size));
+	width: calc(8 * var(--tile-size));
+}
+.tile {
+	position: relative;
+}
+.tile--light {
+	position: relative;
+	background-color: var(--light-tile);
+}
+.tile--dark {
+	position: relative;
+	background-color: var(--dark-tile);
+}
+
+.highlight::after {
+	display: block;
+	position: absolute;
+	content: "";
+	width: calc(0.5 * var(--tile-size));
+	height: calc(0.5 * var(--tile-size));
+	border-radius: 50%;
+	left: 25%;
+	top: 25%;
+	background-color: var(--highlight);
+}
+
+.attacking::after {
+	display: block;
+	position: absolute;
+	content: "";
+	width: calc(0.76 * var(--tile-size));
+	height: calc(0.76 * var(--tile-size));
+	border-radius: 50%;
+	border: 10px solid var(--highlight);
+}
