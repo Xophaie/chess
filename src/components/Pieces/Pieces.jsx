@@ -20,13 +20,16 @@ function Pieces() {
 	};
 
 	function onDrop(e) {
-		console.log(e);
 		const newPosition = copyPosition(currentPosition);
 		const { x, y } = calcCoords(e);
 
 		const [p, rank, file] = e.dataTransfer.getData("text").split(" ");
 
 		if (candidateMoves?.find(coord => coord[0] === x && coord[1] === y)) {
+			// En-passant capturing
+			if (p.endsWith("p") && !newPosition[x][y] && x !== rank && y !== file)
+				newPosition[rank][y] = "";
+
 			newPosition[rank][file] = "";
 			newPosition[x][y] = p;
 

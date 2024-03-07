@@ -17,6 +17,7 @@ function Piece({ piece, rank, file }) {
 				piece,
 				rank,
 				file,
+				positions: position,
 			});
 			dispatch({
 				type: "candidateMoves/generate",
