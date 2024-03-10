@@ -190,7 +190,6 @@ export function getPawnMoves({ position, rank, file, piece, prevPosition }) {
 
 	const enemyPawn = piece[0] === "w" ? "bp" : "wp";
 	const enPassantMoves = [file - 1, file + 1];
-	console.log(position);
 
 	if (prevPosition) {
 		if ((dir === 1 && rank === 4) || (dir === -1 && rank === 3)) {

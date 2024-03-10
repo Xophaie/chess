@@ -1,5 +1,9 @@
 @import "../../constants.css";
 
+* {
+	box-sizing: border-box;
+}
+
 .board {
 	display: grid;
 	position: relative;

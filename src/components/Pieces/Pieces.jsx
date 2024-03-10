@@ -4,6 +4,7 @@ import Piece from "./Piece";
 import { useRef } from "react";
 
 import { copyPosition } from "../../utils";
+import arbiter from "../../arbiter/arbiter";
 
 function Pieces() {
 	const { position, dispatch, turn, candidateMoves } = useChess();
@@ -19,24 +20,39 @@ function Pieces() {
 		return { x, y };
 	};
 
-	function onDrop(e) {
-		const newPosition = copyPosition(currentPosition);
+	function move(e) {
 		const { x, y } = calcCoords(e);
 
 		const [p, rank, file] = e.dataTransfer.getData("text").split(" ");
 
 		if (candidateMoves?.find(coord => coord[0] === x && coord[1] === y)) {
-			// En-passant capturing
-			if (p.endsWith("p") && !newPosition[x][y] && x !== rank && y !== file)
-				newPosition[rank][y] = "";
-
-			newPosition[rank][file] = "";
-			newPosition[x][y] = p;
+			if ((p === "wp" && x === 7) || (p === "bp" && x === 0)) {
+				dispatch({
+					type: "piece/promoting",
+					payload: { rank: Number(rank), file: Number(file), x, y },
+				});
+				return;
+			}
+			const newPosition = arbiter.performMove({
+				position: currentPosition,
+				p,
+				rank,
+				file,
+				x,
+				y,
+			});
 
 			dispatch({ type: "piece/moved", payload: newPosition });
 		}
 
 		dispatch({ type: "candidateMoves/clear" });
+	}
+
+	function onDrop(e) {
+		const newPosition = copyPosition(currentPosition);
+		const { x, y } = calcCoords(e);
+
+		move(e);
 	}
 
 	function onDragOver(e) {

@@ -8,6 +8,8 @@ const initialState = {
 	position: [createPosition()],
 	turn: "w",
 	candidateMoves: [],
+	status: "ongoing",
+	promotionSquare: null,
 };
 
 function reducer(state, action) {
@@ -18,6 +20,19 @@ function reducer(state, action) {
 				position: [...state.position, action.payload],
 				turn: state.turn === "w" ? "b" : "w",
 			};
+		case "piece/promoting":
+			return {
+				...state,
+				status: "promoting",
+				promotionSquare: { ...action.payload },
+			};
+		case "piece/promoted":
+			return {
+				...state,
+				status: "ongoing",
+				promotionSquare: null,
+			};
+
 		case "candidateMoves/generate":
 			return { ...state, candidateMoves: action.payload };
 		case "candidateMoves/clear":
@@ -26,13 +41,22 @@ function reducer(state, action) {
 }
 
 function ChessProvider({ children }) {
-	const [{ position, turn, candidateMoves }, dispatch] = useReducer(
-		reducer,
-		initialState
-	);
+	const [
+		{ position, turn, candidateMoves, status, promotionSquare },
+		dispatch,
+	] = useReducer(reducer, initialState);
 
 	return (
-		<ChessContext.Provider value={{ position, dispatch, turn, candidateMoves }}>
+		<ChessContext.Provider
+			value={{
+				position,
+				dispatch,
+				turn,
+				candidateMoves,
+				status,
+				promotionSquare,
+			}}
+		>
 			{children}
 		</ChessContext.Provider>
 	);

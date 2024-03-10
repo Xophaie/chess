@@ -6,6 +6,7 @@ import {
 	getQueenMoves,
 	getRookMoves,
 } from "./getMoves";
+import { movePawn, movePiece } from "./move.";
 
 const arbiter = {
 	getRegularMoves: function ({ position, piece, rank, file, positions }) {
@@ -26,6 +27,14 @@ const arbiter = {
 				piece,
 				prevPosition: positions[positions.length - 2],
 			});
+	},
+
+	performMove: function ({ position, p, rank, file, x, y }) {
+		if (p.endsWith("p")) {
+			return movePawn({ position, p, rank, file, x, y });
+		} else {
+			return movePiece({ position, p, rank, file, x, y });
+		}
 	},
 };
 

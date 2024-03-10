@@ -1,5 +1,6 @@
 import { useChess } from "../../contexts/ChessContext";
 import Pieces from "../Pieces/Pieces";
+import Popup from "../Popups/Popup";
 import styles from "./Board.module.css";
 import Files from "./Files";
 import Ranks from "./Ranks";
@@ -61,6 +62,8 @@ function Board() {
 			</div>
 
 			<Pieces />
+
+			<Popup />
 
 			<Files files={files} />
 		</div>
