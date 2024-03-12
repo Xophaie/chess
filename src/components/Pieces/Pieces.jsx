@@ -7,7 +7,8 @@ import { copyPosition } from "../../utils";
 import arbiter from "../../arbiter/arbiter";
 
 function Pieces() {
-	const { position, dispatch, turn, candidateMoves } = useChess();
+	const { position, dispatch, turn, candidateMoves, castlingDirection } =
+		useChess();
 	const currentPosition = position[position.length - 1];
 
 	const ref = useRef();
@@ -25,6 +26,8 @@ function Pieces() {
 
 		const [p, rank, file] = e.dataTransfer.getData("text").split(" ");
 
+		if (x === Number(rank) && y === Number(file)) return;
+
 		if (candidateMoves?.find(coord => coord[0] === x && coord[1] === y)) {
 			if ((p === "wp" && x === 7) || (p === "bp" && x === 0)) {
 				dispatch({
@@ -40,7 +43,34 @@ function Pieces() {
 				file,
 				x,
 				y,
+				castlingDirection,
 			});
+
+			if (
+				p.endsWith("r") &&
+				rank % 7 === 0 &&
+				file === 0 &&
+				castlingDirection[p[0]] === "both"
+			) {
+				castlingDirection[p[0]] = "right";
+			}
+
+			if (
+				p.endsWith("r") &&
+				rank % 7 === 0 &&
+				file === 7 &&
+				castlingDirection[p[0]] === "both"
+			) {
+				castlingDirection[p[0]] = "left";
+			}
+
+			if (p === "bk") {
+				castlingDirection.b = "none";
+			}
+
+			if (p === "wk") {
+				castlingDirection.w = "none";
+			}
 
 			dispatch({ type: "piece/moved", payload: newPosition });
 		}
@@ -49,9 +79,6 @@ function Pieces() {
 	}
 
 	function onDrop(e) {
-		const newPosition = copyPosition(currentPosition);
-		const { x, y } = calcCoords(e);
-
 		move(e);
 	}
 

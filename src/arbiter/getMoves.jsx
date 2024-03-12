@@ -1,3 +1,4 @@
+import arbiter from "./arbiter";
 export function getRookMoves({ position, piece, rank, file }) {
 	const moves = [];
 	const us = piece[0];
@@ -130,7 +131,14 @@ export function getQueenMoves({ position, rank, file, piece }) {
 	return moves;
 }
 
-export function getKingMoves({ position, rank, file, piece }) {
+export function getKingMoves({
+	position,
+	rank,
+	file,
+	piece,
+	positions,
+	castlingDirection,
+}) {
 	const moves = [];
 	const us = piece[0];
 
@@ -157,7 +165,188 @@ export function getKingMoves({ position, rank, file, piece }) {
 
 	return moves;
 }
-export function getPawnMoves({ position, rank, file, piece, prevPosition }) {
+
+export const getCastlingMoves = ({
+	position,
+	castlingDirection,
+	piece,
+	rank,
+	file,
+}) => {
+	const moves = [];
+	console.log(piece);
+
+	if (file !== 4 || rank % 7 !== 0 || castlingDirection === "none") {
+		return moves;
+	}
+
+	if (piece.startsWith("w")) {
+		if (
+			arbiter.isChecked({
+				positionAfterMove: position,
+				position,
+				player: "w",
+				piece,
+				rank,
+				file,
+				castlingDirection,
+			})
+		)
+			return moves;
+		if (
+			["left", "both"].includes(castlingDirection.w) &&
+			!position[0][1] &&
+			!position[0][2] &&
+			!position[0][3] &&
+			position[0][0] === "wr" &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 0,
+					y: 3,
+					castlingDirection,
+				}),
+				player: "w",
+			}) &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 0,
+					y: 2,
+					castlingDirection,
+				}),
+				player: "w",
+			})
+		) {
+			moves.push([0, 2]);
+		}
+
+		if (
+			["right", "both"].includes(castlingDirection.w) &&
+			!position[0][5] &&
+			!position[0][6] &&
+			position[0][7] === "wr" &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 0,
+					y: 5,
+					castlingDirection,
+				}),
+				player: "w",
+			}) &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 0,
+					y: 6,
+					castlingDirection,
+				}),
+				player: "w",
+			})
+		) {
+			moves.push([0, 6]);
+		}
+	}
+
+	if (piece.startsWith("b")) {
+		if (
+			arbiter.isChecked({
+				positionAfterMove: position,
+				position,
+				player: "b",
+				piece,
+				rank,
+				file,
+				castlingDirection,
+			})
+		)
+			return moves;
+
+		if (
+			["left", "both"].includes(castlingDirection.b) &&
+			!position[7][1] &&
+			!position[7][2] &&
+			!position[7][3] &&
+			position[7][0] === "br" &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 7,
+					y: 3,
+					castlingDirection,
+				}),
+				player: "b",
+			}) &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 7,
+					y: 2,
+					castlingDirection,
+				}),
+				player: "b",
+			})
+		) {
+			moves.push([7, 2]);
+		}
+
+		if (
+			["right", "both"].includes(castlingDirection.b) &&
+			!position[7][5] &&
+			!position[7][6] &&
+			position[7][7] === "br" &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 7,
+					y: 5,
+					castlingDirection,
+				}),
+				player: "b",
+			}) &&
+			!arbiter.isChecked({
+				positionAfterMove: arbiter.performMove({
+					position,
+					p: piece,
+					rank,
+					file,
+					x: 7,
+					y: 6,
+					castlingDirection,
+				}),
+				player: "b",
+			})
+		) {
+			moves.push([7, 6]);
+		}
+	}
+
+	return moves;
+};
+
+export function getPawnMoves({ position, rank, file, piece, positions }) {
 	const moves = [];
 	const enemy = piece[0] === "w" ? "b" : "w";
 	const dir = piece === "wp" ? 1 : -1;
@@ -188,6 +377,7 @@ export function getPawnMoves({ position, rank, file, piece, prevPosition }) {
 
 	// ************** En passant **************
 
+	const prevPosition = positions?.[positions?.length - 2];
 	const enemyPawn = piece[0] === "w" ? "bp" : "wp";
 	const enPassantMoves = [file - 1, file + 1];
 
@@ -207,4 +397,38 @@ export function getPawnMoves({ position, rank, file, piece, prevPosition }) {
 	}
 
 	return moves;
+}
+
+export function getKingPosition({ positionAfterMove, player }) {
+	let kingPosition;
+	console.log(positionAfterMove);
+	positionAfterMove.forEach((rank, x) => {
+		rank.forEach((file, y) => {
+			if (
+				positionAfterMove[x][y].endsWith("k") &&
+				positionAfterMove[x][y].startsWith(player)
+			)
+				kingPosition = [x, y];
+		});
+	});
+
+	return kingPosition;
+}
+
+export function getPieces({ positionAfterMove, enemy }) {
+	const enemyPieces = [];
+
+	positionAfterMove.forEach((rank, x) => {
+		rank.forEach((file, y) => {
+			if (positionAfterMove[x][y].startsWith(enemy)) {
+				enemyPieces.push({
+					piece: positionAfterMove[x][y],
+					file: y,
+					rank: x,
+				});
+			}
+		});
+	});
+
+	return enemyPieces;
 }

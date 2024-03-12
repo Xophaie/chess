@@ -3,7 +3,7 @@ import { useChess } from "../../contexts/ChessContext";
 import styles from "./Pieces.module.css";
 
 function Piece({ piece, rank, file }) {
-	const { position, dispatch, turn } = useChess();
+	const { position, dispatch, turn, castlingDirection } = useChess();
 	const currentPosition = position[position.length - 1];
 
 	function onDragStart(e) {
@@ -12,12 +12,13 @@ function Piece({ piece, rank, file }) {
 		setTimeout(() => (e.target.style.display = "none"), 0);
 
 		if (turn === piece[0]) {
-			const candidateMoves = arbiter.getRegularMoves({
+			const candidateMoves = arbiter.getValidMoves({
 				position: currentPosition,
 				piece,
 				rank,
 				file,
 				positions: position,
+				castlingDirection,
 			});
 			dispatch({
 				type: "candidateMoves/generate",

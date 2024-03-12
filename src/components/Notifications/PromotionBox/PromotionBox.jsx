@@ -20,7 +20,7 @@ function PromotionBox() {
 	}
 
 	return (
-		<div className={`${styles["popup-inner"]} ${styles["promotion-choices"]}`}>
+		<div className={`${styles["inner"]} ${styles["promotion-choices"]}`}>
 			{options.map(option => (
 				<div
 					key={option}

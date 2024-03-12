@@ -1,4 +1,4 @@
-.popup {
+.notification {
 	top: 0;
 	right: 0;
 	position: absolute;
@@ -6,7 +6,7 @@
 	bottom: calc(0.25 * var(--tile-size));
 }
 
-.popup-inner {
+.inner {
 	left: -65%;
 	top: 43%;
 	width: 50%;

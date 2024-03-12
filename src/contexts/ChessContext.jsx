@@ -10,6 +10,10 @@ const initialState = {
 	candidateMoves: [],
 	status: "ongoing",
 	promotionSquare: null,
+	castlingDirection: {
+		w: "both",
+		b: "both",
+	},
 };
 
 function reducer(state, action) {
@@ -42,7 +46,14 @@ function reducer(state, action) {
 
 function ChessProvider({ children }) {
 	const [
-		{ position, turn, candidateMoves, status, promotionSquare },
+		{
+			position,
+			turn,
+			candidateMoves,
+			status,
+			promotionSquare,
+			castlingDirection,
+		},
 		dispatch,
 	] = useReducer(reducer, initialState);
 
@@ -55,6 +66,7 @@ function ChessProvider({ children }) {
 				candidateMoves,
 				status,
 				promotionSquare,
+				castlingDirection,
 			}}
 		>
 			{children}

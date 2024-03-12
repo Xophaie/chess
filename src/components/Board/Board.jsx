@@ -1,12 +1,15 @@
+import arbiter from "../../arbiter/arbiter";
+import { getKingPosition } from "../../arbiter/getMoves";
 import { useChess } from "../../contexts/ChessContext";
+import Notification from "../Notifications/Notifcation";
 import Pieces from "../Pieces/Pieces";
-import Popup from "../Popups/Popup";
 import styles from "./Board.module.css";
 import Files from "./Files";
 import Ranks from "./Ranks";
 
 function Board() {
-	let { position, candidateMoves } = useChess();
+	let { position, candidateMoves, turn, positions, castlingDirection } =
+		useChess();
 	position = position[position.length - 1];
 
 	const ranks = Array(8)
@@ -17,25 +20,62 @@ function Board() {
 		.fill("")
 		.map((_, j) => String.fromCharCode(96 + (j + 1)));
 
-	function getClassName(i, j) {
-		let c = "";
+	const isPlayerChecked = (() => {
+		if (
+			arbiter.isChecked({
+				positionAfterMove: position,
+				player: turn,
+				position,
+				positions,
+				castlingDirection,
+			})
+		) {
+			console.log(
+				getKingPosition({ positionAfterMove: position, player: turn })
+			);
+			return getKingPosition({ positionAfterMove: position, player: turn });
+		}
 
-		c += (i + j) % 2 === 0 ? "tile--dark" : "tile--light";
+		return null;
+	})();
+	function getClassName(i, j) {
+		let c = [];
+
+		if ((i + j) % 2 === 0) c.push("tile--dark");
+		else c.push("tile--light");
+
+		if (candidateMoves?.find(coord => coord[0] === i && coord[1] === j)) {
+			if (position[i][j]) {
+				c.push("attacking");
+			} else {
+				c.push("highlight");
+			}
+		}
+
+		if (
+			isPlayerChecked &&
+			isPlayerChecked[0] === i &&
+			isPlayerChecked[1] === j
+		) {
+			c.push("checked");
+		}
 
 		return c;
 	}
 
-	function getExtendedClassName(i, j) {
-		let cExt = "";
-		if (candidateMoves?.find(coord => coord[0] === i && coord[1] === j)) {
-			if (position[i][j]) {
-				cExt += "attacking";
-			} else {
-				cExt += "highlight";
-			}
-		}
-		return cExt;
-	}
+	const classLister =
+		styleObject =>
+		(...classList) =>
+			classList.reduce((list, myClass) => {
+				let output = list;
+				if (styleObject[myClass]) {
+					if (list) output += " ";
+					output += styleObject[myClass];
+				}
+				return output;
+			}, "");
+
+	const classes = classLister(styles);
 
 	return (
 		<div className={styles.board}>
@@ -48,14 +88,7 @@ function Board() {
 							key={file + "" + rank}
 							data-i={i}
 							data-j={j}
-							className={`
-							${styles[`${getClassName(7 - i, j)}`]} 
-							${
-								styles[`${getExtendedClassName(7 - i, j)}`]
-									? styles[`${getExtendedClassName(7 - i, j)}`]
-									: ""
-							}
-							`}
+							className={classes(...getClassName(7 - i, j))}
 						></span>
 					))
 				)}
@@ -63,7 +96,7 @@ function Board() {
 
 			<Pieces />
 
-			<Popup />
+			<Notification />
 
 			<Files files={files} />
 		</div>

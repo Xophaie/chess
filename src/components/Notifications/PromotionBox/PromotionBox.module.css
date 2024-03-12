@@ -1,6 +1,5 @@
 @import "../../Pieces/Pieces.module.css";
-@import "../Popup.module.css";
-
+@import "../Notifcation.module.css";
 .promotion-choices {
 	height: 12.5%;
 }
