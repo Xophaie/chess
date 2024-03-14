@@ -1,0 +1,32 @@
+.notations {
+	display: flex;
+	flex: 1 1;
+	flex-wrap: wrap;
+	overflow: auto;
+	color: var(--dark-tile);
+	flex-direction: row;
+	align-content: start;
+}
+
+.notations::-webkit-scrollbar {
+	display: none;
+}
+.notations {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.notations div {
+	flex-basis: 35%;
+	padding-left: 15%;
+	text-align: left;
+	position: relative;
+	padding-bottom: 5px;
+}
+
+.notations div[data-number]:nth-child(odd)::before {
+	content: attr(data-number);
+	position: absolute;
+	left: 0;
+	opacity: 0.5;
+}

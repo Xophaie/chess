@@ -1,3 +1,4 @@
+export const getCharacter = file => String.fromCharCode(file + 96);
 export function createPosition() {
 	const position = Array(8)
 		.fill("")
@@ -55,4 +56,43 @@ export function findPieceCoords(position, piece) {
 		});
 	});
 	return results;
+}
+
+export function getNewMoveNotation({
+	p,
+	rank,
+	file,
+	x,
+	y,
+	position,
+	promotesTo,
+}) {
+	let note = "";
+
+	rank = Number(rank);
+	file = Number(file);
+
+	if (p[1] === "k" && Math.abs(y - file) === 2) {
+		if (file > y) return "O-O";
+		else return "O-O-O";
+	}
+
+	if (!p.endsWith("p")) {
+		note += p[1].toUpperCase();
+		if (position[x][y]) {
+			note += "x";
+		}
+	} else {
+		if (rank !== x && file !== y) {
+			note += getCharacter(file + 1) + "x";
+		}
+	}
+
+	note += getCharacter(y + 1) + (x + 1);
+
+	if (promotesTo) {
+		note += "=" + promotesTo.toUpperCase();
+	}
+
+	return note;
 }

@@ -1,0 +1,9 @@
+.control {
+	display: flex;
+	flex-direction: column;
+
+	height: calc(8 * var(--tile-size));
+	padding: 10px;
+	text-align: center;
+	color: white;
+}

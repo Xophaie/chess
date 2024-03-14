@@ -15,6 +15,7 @@ const initialState = {
 		b: "both",
 	},
 	message: null,
+	movesList: [],
 };
 
 function reducer(state, action) {
@@ -22,8 +23,9 @@ function reducer(state, action) {
 		case "piece/moved":
 			return {
 				...state,
-				position: [...state.position, action.payload],
+				position: [...state.position, action.payload.newPosition],
 				turn: state.turn === "w" ? "b" : "w",
+				movesList: [...state.movesList, action.payload.newMove],
 			};
 		case "piece/promoting":
 			return {
@@ -60,6 +62,13 @@ function reducer(state, action) {
 			return { ...state, status: "black-won", message: "Black won" };
 		case "game/reset":
 			return { ...initialState };
+		case "game/takeback":
+			return {
+				...state,
+				turn: state.turn === "w" ? "b" : "w",
+				position: state.position.slice(0, -1),
+				movesList: state.movesList.slice(0, -1),
+			};
 	}
 }
 
@@ -73,6 +82,7 @@ function ChessProvider({ children }) {
 			promotionSquare,
 			castlingDirection,
 			message,
+			movesList,
 		},
 		dispatch,
 	] = useReducer(reducer, initialState);
@@ -88,6 +98,7 @@ function ChessProvider({ children }) {
 				promotionSquare,
 				castlingDirection,
 				message,
+				movesList,
 			}}
 		>
 			{children}

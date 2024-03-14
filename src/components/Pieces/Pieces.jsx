@@ -3,7 +3,7 @@ import styles from "./Pieces.module.css";
 import Piece from "./Piece";
 import { useRef } from "react";
 
-import { copyPosition } from "../../utils";
+import { copyPosition, getNewMoveNotation } from "../../utils";
 import arbiter from "../../arbiter/arbiter";
 
 function Pieces() {
@@ -54,15 +54,6 @@ function Pieces() {
 				castlingDirection,
 			});
 
-			console.log(
-				p,
-				rank % 7 === 0,
-				Number(file) === 0,
-				x,
-				y,
-				castlingDirection[p[0]]
-			);
-
 			if (
 				p.endsWith("r") &&
 				Number(rank) % 7 === 0 &&
@@ -102,8 +93,19 @@ function Pieces() {
 			if (p === "wk") {
 				castlingDirection.w = "none";
 			}
+			const newMove = getNewMoveNotation({
+				p,
+				rank,
+				file,
+				x,
+				y,
+				position: currentPosition,
+			});
 
-			dispatch({ type: "piece/moved", payload: newPosition });
+			dispatch({
+				type: "piece/moved",
+				payload: { newPosition, newMove },
+			});
 
 			if (arbiter.insufficientMaterial({ newPosition })) {
 				dispatch({ type: "game/insufficient-material" });
@@ -115,8 +117,9 @@ function Pieces() {
 					position,
 					positions,
 				})
-			)
+			) {
 				dispatch({ type: "game/stalemate" });
+			}
 
 			if (
 				arbiter.isCheckmate({
@@ -127,6 +130,15 @@ function Pieces() {
 					positions,
 				})
 			) {
+				console.log(
+					arbiter.isCheckmate({
+						newPosition,
+						enemy,
+						castlingDirection,
+						position,
+						positions,
+					})
+				);
 				enemy === "b"
 					? dispatch({ type: "game/white-won" })
 					: dispatch({ type: "game/black-won" });

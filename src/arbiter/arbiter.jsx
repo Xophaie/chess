@@ -194,6 +194,10 @@ const arbiter = {
 			player: enemy,
 		});
 
+		console.log(newPosition);
+
+		console.log(isInCheck);
+
 		const pieces = getPieces({ positionAfterMove: newPosition, enemy });
 
 		const moves = pieces.reduce(
