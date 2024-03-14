@@ -131,14 +131,7 @@ export function getQueenMoves({ position, rank, file, piece }) {
 	return moves;
 }
 
-export function getKingMoves({
-	position,
-	rank,
-	file,
-	piece,
-	positions,
-	castlingDirection,
-}) {
+export function getKingMoves({ position, rank, file, piece }) {
 	const moves = [];
 	const us = piece[0];
 

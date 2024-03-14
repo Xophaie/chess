@@ -1,4 +1,3 @@
-import { useChess } from "../contexts/ChessContext";
 import { copyPosition } from "../utils";
 
 export function movePawn({ position, p, rank, file, x, y }) {

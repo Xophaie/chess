@@ -1,3 +1,6 @@
+import moveSound from "./assets/moveSound.mp3";
+import capture from "./assets/capture.mp3";
+
 export const getCharacter = file => String.fromCharCode(file + 96);
 export function createPosition() {
 	const position = Array(8)
@@ -56,6 +59,11 @@ export function findPieceCoords(position, piece) {
 		});
 	});
 	return results;
+}
+
+export function playSound(type) {
+	const sound = new Audio(type === "capture" ? capture : moveSound);
+	sound.play();
 }
 
 export function getNewMoveNotation({

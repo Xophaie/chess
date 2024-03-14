@@ -1,6 +1,6 @@
 import arbiter from "../../../arbiter/arbiter";
 import { useChess } from "../../../contexts/ChessContext";
-import { copyPosition, getNewMoveNotation } from "../../../utils";
+import { copyPosition, getNewMoveNotation, playSound } from "../../../utils";
 import styles from "./PromotionBox.module.css";
 
 function PromotionBox() {
@@ -23,6 +23,12 @@ function PromotionBox() {
 			position,
 			promotesTo: option,
 		});
+
+		if (position[Number(promotionSquare.x)][Number(promotionSquare.y)]) {
+			playSound("capture");
+		} else {
+			playSound("move");
+		}
 
 		dispatch({ type: "piece/moved", payload: { newPosition, newMove } });
 		dispatch({ type: "piece/promoted" });
@@ -50,15 +56,6 @@ function PromotionBox() {
 				positions,
 			})
 		) {
-			console.log(
-				arbiter.isCheckmate({
-					newPosition,
-					enemy,
-					castlingDirection,
-					position,
-					positions,
-				})
-			);
 			enemy === "b"
 				? dispatch({ type: "game/white-won" })
 				: dispatch({ type: "game/black-won" });

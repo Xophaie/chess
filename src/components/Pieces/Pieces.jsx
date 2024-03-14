@@ -3,18 +3,12 @@ import styles from "./Pieces.module.css";
 import Piece from "./Piece";
 import { useRef } from "react";
 
-import { copyPosition, getNewMoveNotation } from "../../utils";
+import { getNewMoveNotation, playSound } from "../../utils";
 import arbiter from "../../arbiter/arbiter";
 
 function Pieces() {
-	const {
-		position,
-		dispatch,
-		turn,
-		candidateMoves,
-		castlingDirection,
-		positions,
-	} = useChess();
+	const { position, dispatch, candidateMoves, castlingDirection, positions } =
+		useChess();
 	const currentPosition = position[position.length - 1];
 
 	const ref = useRef();
@@ -101,6 +95,12 @@ function Pieces() {
 				y,
 				position: currentPosition,
 			});
+
+			if (currentPosition[Number(x)][Number(y)]) {
+				playSound("capture");
+			} else {
+				playSound("move");
+			}
 
 			dispatch({
 				type: "piece/moved",

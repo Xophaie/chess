@@ -109,7 +109,6 @@ const arbiter = {
 
 	isChecked: function ({
 		positionAfterMove,
-		position,
 		positions,
 		castlingDirection,
 		player,
@@ -193,10 +192,6 @@ const arbiter = {
 			castlingDirection,
 			player: enemy,
 		});
-
-		console.log(newPosition);
-
-		console.log(isInCheck);
 
 		const pieces = getPieces({ positionAfterMove: newPosition, enemy });
 
