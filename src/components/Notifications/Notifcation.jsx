@@ -1,15 +1,10 @@
 import { useChess } from "../../contexts/ChessContext";
 import styles from "./Notifcation.module.css";
-import PromotionBox from "./PromotionBox/PromotionBox";
 
-export default function Notification() {
+export default function Notification({ children }) {
 	const { status } = useChess();
 
 	if (status === "ongoing") return null;
 
-	return (
-		<div className={styles.notification}>
-			{status === "promoting" && <PromotionBox />}
-		</div>
-	);
+	return <div className={styles.notification}>{children}</div>;
 }

@@ -6,9 +6,11 @@ import Pieces from "../Pieces/Pieces";
 import styles from "./Board.module.css";
 import Files from "./Files";
 import Ranks from "./Ranks";
+import PromotionBox from "../Notifications/PromotionBox/PromotionBox";
+import GameEnds from "../Notifications/GameEnds/GameEnds";
 
 function Board() {
-	let { position, candidateMoves, turn, positions, castlingDirection } =
+	let { position, candidateMoves, turn, positions, castlingDirection, status } =
 		useChess();
 	position = position[position.length - 1];
 
@@ -30,9 +32,6 @@ function Board() {
 				castlingDirection,
 			})
 		) {
-			console.log(
-				getKingPosition({ positionAfterMove: position, player: turn })
-			);
 			return getKingPosition({ positionAfterMove: position, player: turn });
 		}
 
@@ -96,7 +95,10 @@ function Board() {
 
 			<Pieces />
 
-			<Notification />
+			<Notification>
+				{status === "promoting" && <PromotionBox />}
+				<GameEnds />
+			</Notification>
 
 			<Files files={files} />
 		</div>

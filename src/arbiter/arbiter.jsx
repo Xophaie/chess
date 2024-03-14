@@ -10,6 +10,7 @@ import {
 	getRookMoves,
 } from "./getMoves";
 import { movePawn, movePiece } from "./move.";
+import { areSameTilesColor, findPieceCoords } from "../utils";
 
 const arbiter = {
 	getRegularMoves: function ({
@@ -140,8 +141,107 @@ const arbiter = {
 		return false;
 	},
 
+	isStalemate: function ({
+		newPosition,
+		enemy,
+		castlingDirection,
+		position,
+		positions,
+	}) {
+		const isInCheck = this.isChecked({
+			positionAfterMove: newPosition,
+			position,
+			positions,
+			castlingDirection,
+			player: enemy,
+		});
+
+		if (isInCheck) return false;
+
+		const pieces = getPieces({ positionAfterMove: newPosition, enemy });
+
+		const moves = pieces.reduce(
+			(acc, p) =>
+				(acc = [
+					...acc,
+					...this.getValidMoves({
+						position: newPosition,
+						piece: p.piece,
+						castlingDirection,
+						rank: p.rank,
+						file: p.file,
+						prevPosition: positions?.[positions?.length - 2],
+					}),
+				]),
+			[]
+		);
+
+		return !isInCheck && moves.length === 0;
+	},
+
+	isCheckmate: function ({
+		newPosition,
+		enemy,
+		castlingDirection,
+		position,
+		positions,
+	}) {
+		const isInCheck = this.isChecked({
+			positionAfterMove: newPosition,
+			position,
+			positions,
+			castlingDirection,
+			player: enemy,
+		});
+
+		const pieces = getPieces({ positionAfterMove: newPosition, enemy });
+
+		const moves = pieces.reduce(
+			(acc, p) =>
+				(acc = [
+					...acc,
+					...this.getValidMoves({
+						position: newPosition,
+						piece: p.piece,
+						castlingDirection,
+						rank: p.rank,
+						file: p.file,
+						prevPosition: positions?.[positions?.length - 2],
+					}),
+				]),
+			[]
+		);
+
+		return isInCheck && moves.length === 0;
+	},
+
+	insufficientMaterial: function ({ newPosition }) {
+		const pieces = newPosition.reduce(
+			(acc, rank) => (acc = [...acc, ...rank.filter(x => x)]),
+			[]
+		);
+
+		if (pieces.length === 2) return true;
+		if (
+			pieces.length === 3 &&
+			pieces.some(p => p.endsWith("n") || p.endsWith("b"))
+		)
+			return true;
+
+		if (
+			pieces.length === 4 &&
+			pieces.every(p => p.endsWith("b") || p.endsWith("k")) &&
+			new Set(pieces).size === 4 &&
+			areSameTilesColor(
+				findPieceCoords(newPosition, "wb")[0],
+				findPieceCoords(newPosition, "bb")[0]
+			)
+		)
+			return true;
+		return false;
+	},
+
 	performMove: function ({ position, p, rank, file, x, y, castlingDirection }) {
-		console.log(p);
 		if (p.endsWith("p")) {
 			return movePawn({ position, p, rank, file, x, y });
 		} else {

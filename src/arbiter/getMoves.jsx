@@ -174,7 +174,6 @@ export const getCastlingMoves = ({
 	file,
 }) => {
 	const moves = [];
-	console.log(piece);
 
 	if (file !== 4 || rank % 7 !== 0 || castlingDirection === "none") {
 		return moves;
@@ -401,7 +400,6 @@ export function getPawnMoves({ position, rank, file, piece, positions }) {
 
 export function getKingPosition({ positionAfterMove, player }) {
 	let kingPosition;
-	console.log(positionAfterMove);
 	positionAfterMove.forEach((rank, x) => {
 		rank.forEach((file, y) => {
 			if (

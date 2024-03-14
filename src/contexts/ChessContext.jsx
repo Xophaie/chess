@@ -14,6 +14,7 @@ const initialState = {
 		w: "both",
 		b: "both",
 	},
+	message: null,
 };
 
 function reducer(state, action) {
@@ -41,6 +42,24 @@ function reducer(state, action) {
 			return { ...state, candidateMoves: action.payload };
 		case "candidateMoves/clear":
 			return { ...state, candidateMoves: [] };
+		case "game/stalemate":
+			return {
+				...state,
+				status: "stalemate",
+				message: "Game ends due to stalemate",
+			};
+		case "game/insufficient-material":
+			return {
+				...state,
+				status: "insufficient-material",
+				message: "Game ends due to insufficient material",
+			};
+		case "game/white-won":
+			return { ...state, status: "white-won", message: "White won" };
+		case "game/black-won":
+			return { ...state, status: "black-won", message: "Black won" };
+		case "game/reset":
+			return { ...initialState };
 	}
 }
 
@@ -53,6 +72,7 @@ function ChessProvider({ children }) {
 			status,
 			promotionSquare,
 			castlingDirection,
+			message,
 		},
 		dispatch,
 	] = useReducer(reducer, initialState);
@@ -67,6 +87,7 @@ function ChessProvider({ children }) {
 				status,
 				promotionSquare,
 				castlingDirection,
+				message,
 			}}
 		>
 			{children}

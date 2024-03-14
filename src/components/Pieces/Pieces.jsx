@@ -7,8 +7,14 @@ import { copyPosition } from "../../utils";
 import arbiter from "../../arbiter/arbiter";
 
 function Pieces() {
-	const { position, dispatch, turn, candidateMoves, castlingDirection } =
-		useChess();
+	const {
+		position,
+		dispatch,
+		turn,
+		candidateMoves,
+		castlingDirection,
+		positions,
+	} = useChess();
 	const currentPosition = position[position.length - 1];
 
 	const ref = useRef();
@@ -25,6 +31,8 @@ function Pieces() {
 		const { x, y } = calcCoords(e);
 
 		const [p, rank, file] = e.dataTransfer.getData("text").split(" ");
+
+		const enemy = p.startsWith("w") ? "b" : "w";
 
 		if (x === Number(rank) && y === Number(file)) return;
 
@@ -46,23 +54,46 @@ function Pieces() {
 				castlingDirection,
 			});
 
-			if (
-				p.endsWith("r") &&
-				rank % 7 === 0 &&
-				file === 0 &&
-				castlingDirection[p[0]] === "both"
-			) {
-				castlingDirection[p[0]] = "right";
-			}
+			console.log(
+				p,
+				rank % 7 === 0,
+				Number(file) === 0,
+				x,
+				y,
+				castlingDirection[p[0]]
+			);
 
 			if (
 				p.endsWith("r") &&
-				rank % 7 === 0 &&
-				file === 7 &&
+				Number(rank) % 7 === 0 &&
+				Number(file) === 0 &&
 				castlingDirection[p[0]] === "both"
-			) {
+			)
+				castlingDirection[p[0]] = "right";
+
+			if (
+				p.endsWith("r") &&
+				Number(rank) % 7 === 0 &&
+				Number(file) === 0 &&
+				castlingDirection[p[0]] === "left"
+			)
+				castlingDirection[p[0]] = "none";
+
+			if (
+				p.endsWith("r") &&
+				Number(rank) % 7 === 0 &&
+				Number(file) === 7 &&
+				castlingDirection[p[0]] === "both"
+			)
 				castlingDirection[p[0]] = "left";
-			}
+
+			if (
+				p.endsWith("r") &&
+				Number(rank) % 7 === 0 &&
+				Number(file) === 7 &&
+				castlingDirection[p[0]] === "right"
+			)
+				castlingDirection[p[0]] = "none";
 
 			if (p === "bk") {
 				castlingDirection.b = "none";
@@ -73,6 +104,33 @@ function Pieces() {
 			}
 
 			dispatch({ type: "piece/moved", payload: newPosition });
+
+			if (arbiter.insufficientMaterial({ newPosition })) {
+				dispatch({ type: "game/insufficient-material" });
+			} else if (
+				arbiter.isStalemate({
+					newPosition,
+					enemy,
+					castlingDirection: castlingDirection[enemy],
+					position,
+					positions,
+				})
+			)
+				dispatch({ type: "game/stalemate" });
+
+			if (
+				arbiter.isCheckmate({
+					newPosition,
+					enemy,
+					castlingDirection,
+					position,
+					positions,
+				})
+			) {
+				enemy === "b"
+					? dispatch({ type: "game/white-won" })
+					: dispatch({ type: "game/black-won" });
+			}
 		}
 
 		dispatch({ type: "candidateMoves/clear" });
